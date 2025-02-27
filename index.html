@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iframe Page</title>
+  <style>
+    /* Carousel container */
+    .carousel {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      overflow: hidden;
+    }
+
+    /* Image wrapper for carousel images */
+    .carousel-images {
+      display: flex;
+      transition: transform 1s ease-in-out;
+    }
+
+    .carousel-images img {
+      width: 100%;
+      height: auto;
+    }
+
+    /* Buttons for carousel navigation */
+    .prev, .next {
+      position: absolute;
+      top: 50%;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      font-size: 18px;
+      padding: 16px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .prev {
+      left: 10px;
+      transform: translateY(-50%);
+    }
+
+    .next {
+      right: 10px;
+      transform: translateY(-50%);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Carousel container -->
+  <div class="carousel">
+    <div class="carousel-images">
+      <!-- Images will be dynamically inserted here -->
+    </div>
+    <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
+    <button class="next" onclick="moveSlide(1)">&#10095;</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    let images = [];
+
+    // Listen for messages from parent
+    window.addEventListener('message', function(event) {
+      if (event.data.images) {
+        images = event.data.images;
+        updateCarousel();  // Update the carousel with new images
+      }
+    });
+
+    // Function to update the carousel with new images
+    function updateCarousel() {
+      const carouselImages = document.querySelector('.carousel-images');
+      carouselImages.innerHTML = '';  // Clear previous images
+
+      images.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        carouselImages.appendChild(img);
+      });
+    }
+
+    function moveSlide(direction) {
+      const totalSlides = images.length;
+      currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+      document.querySelector('.carousel-images').style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+
+    // Auto slide every 3 seconds
+    setInterval(() => {
+      moveSlide(1);
+    }, 3000);
+  </script>
+
+</body>
+</html>
